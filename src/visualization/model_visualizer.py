@@ -13,5 +13,4 @@ def plot_feature_importance(model, feature_names, output_path):
     plt.title('Feature Importance (Logistic Regression Coefficients)')
     plt.tight_layout()
     plt.savefig(output_path)
-    plt.show()
     plt.close()

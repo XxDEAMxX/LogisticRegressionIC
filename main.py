@@ -1,6 +1,5 @@
 # main.py
 # Proyecto: Clasificación de supervivencia en el Titanic usando Regresión Logística
-# Autor: [Tu Nombre]
 # Descripción: Este script carga, preprocesa, entrena y evalúa un modelo de regresión logística sobre el dataset del Titanic.
 # El algoritmo de regresión logística es un método de clasificación supervisada que estima la probabilidad de que una instancia pertenezca a una clase (por ejemplo, sobrevivir o no).
 # Utiliza la función sigmoide para transformar una combinación lineal de las variables independientes en una probabilidad entre 0 y 1.
@@ -15,6 +14,10 @@ from src.visualization.data_visualizer import plot_correlation_matrix  # Grafica
 from src.visualization.model_visualizer import plot_feature_importance  # Grafica la importancia de las variables
 from src.utils.config import *  # Rutas de archivos y configuración
 from sklearn.model_selection import train_test_split  # Divide los datos en entrenamiento y prueba
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
 
 
 def main():
@@ -53,6 +56,31 @@ def main():
     # - Calcula métricas como accuracy, precisión, recall, F1 y matriz de confusión
     metrics = evaluate_model(model, X_test, y_test, calculate_metrics)
     print("Metrics:", metrics)
+
+    # Extrae la matriz de confusión calculada previamente en las métricas del modelo. 'cm' es un arreglo 2x2 con los conteos de predicciones correctas e incorrectas.
+    cm = metrics['confusion_matrix']
+    # Crea una nueva figura de matplotlib con tamaño 6x5 pulgadas para la gráfica.
+    plt.figure(figsize=(6,5))
+    # Dibuja un mapa de calor (heatmap) de la matriz de confusión usando seaborn.
+    # - 'annot=True' muestra los valores en cada celda.
+    # - 'fmt="d"' muestra los valores como enteros.
+    # - 'cmap="Blues"' usa una paleta azul.
+    # - 'xticklabels' y 'yticklabels' ponen etiquetas descriptivas en los ejes.
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['No sobrevivió', 'Sobrevivió'], yticklabels=['No sobrevivió', 'Sobrevivió'])
+    # Añade la etiqueta 'Predicción' al eje X.
+    plt.xlabel('Predicción')
+    # Añade la etiqueta 'Real' al eje Y.
+    plt.ylabel('Real')
+    # Añade el título a la gráfica.
+    plt.title('Matriz de Confusión - Regresión Logística')
+    # Ajusta el diseño para evitar que los elementos se solapen.
+    plt.tight_layout()
+    # Asegura que la carpeta 'results' exista para guardar la imagen.
+    os.makedirs('results', exist_ok=True)
+    # Guarda la gráfica como imagen PNG en la carpeta 'results'.
+    plt.savefig('results/confusion_matrix.png')
+    # Cierra la figura para liberar memoria.
+    plt.close()
 
     # 9. Analizar la importancia de las variables
     # - Grafica los coeficientes absolutos del modelo para ver qué variables influyen más en la predicción
