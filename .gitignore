@@ -4,6 +4,14 @@ __pycache__/
 *.pyo
 *.pyd
 
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+.env/
+
 # Jupyter Notebooks
 .ipynb_checkpoints
 
@@ -24,10 +32,8 @@ results/
 # VSCode
 .vscode/
 
-# Environment
+# Environment variables
 .env
-venv/
-ENV/
 
 # OS files
 .DS_Store
