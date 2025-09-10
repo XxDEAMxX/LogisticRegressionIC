@@ -38,7 +38,7 @@ RegLog/
 
 1. **Navega al directorio del proyecto**
    ```
-   cd RegLog
+   cd LogisticRegressionIC
    ```
 
 2. **Crea un entorno virtual**
