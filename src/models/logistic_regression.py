@@ -10,17 +10,31 @@ from sklearn.linear_model import LogisticRegression
 import pickle
 
 
-def train_logistic_regression(X_train, y_train):
+def train_logistic_regression(X_train, y_train, C=1.0, penalty='l2', solver='lbfgs', max_iter=1000, class_weight=None):
     """
-    Entrena un modelo de regresión logística sobre los datos de entrenamiento.
+    Entrena un modelo de regresión logística con hiperparámetros ajustables.
+    
     Args:
-        X_train (DataFrame): Variables independientes (predictoras) del conjunto de entrenamiento.
-        y_train (Series): Variable dependiente (objetivo) del conjunto de entrenamiento.
-    Returns:
-        model (LogisticRegression): Modelo entrenado de regresión logística.
+        X_train (DataFrame): Variables independientes del conjunto de entrenamiento.
+        y_train (Series): Variable dependiente del conjunto de entrenamiento.
+        C (float): Regularización inverso (menor = más regularización).
+        penalty (str): Tipo de regularización ('l1', 'l2').
+        solver (str): Algoritmo de optimización ('lbfgs', 'liblinear').
+        max_iter (int): Iteraciones máximas para convergencia.
+        class_weight (str): Manejo de clases desbalanceadas ('balanced').
     """
-    # Crea una instancia del modelo de regresión logística con un máximo de 1000 iteraciones para asegurar la convergencia.
-    model = LogisticRegression(max_iter=1000)
+    # C=1.0: Balance estándar entre sesgo y varianza para datasets pequeños
+    # penalty='l2': Regularización estable que evita overfitting sin eliminar variables
+    # solver='lbfgs': Eficiente para datasets pequeños/medianos con regularización L2
+    # max_iter=1000: Garantiza convergencia (usualmente converge en <100 iteraciones)
+    # class_weight=None: Sin ajuste automático de pesos (usar 'balanced' si hay desbalance)
+    model = LogisticRegression(
+        C=C,
+        penalty=penalty,
+        solver=solver,
+        max_iter=max_iter,
+        class_weight=class_weight
+    )
     # Entrena el modelo ajustando los coeficientes internos para encontrar la mejor relación entre las variables independientes (X_train)
     # y la variable dependiente (y_train). El modelo aprende a predecir la probabilidad de cada clase usando la función sigmoide.
     model.fit(X_train, y_train)

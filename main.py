@@ -42,7 +42,7 @@ def main():
 
     # 5. Dividir el dataset en entrenamiento y prueba
     # - Permite evaluar el modelo en datos no vistos
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)   
 
     # 6. Entrenar el modelo de regresión logística
     # - Ajusta los coeficientes para predecir la probabilidad de supervivencia
@@ -57,29 +57,50 @@ def main():
     metrics = evaluate_model(model, X_test, y_test, calculate_metrics)
     print("Metrics:", metrics)
 
-    # Extrae la matriz de confusión calculada previamente en las métricas del modelo. 'cm' es un arreglo 2x2 con los conteos de predicciones correctas e incorrectas.
+    # Análisis avanzado de la matriz de confusión
+    from src.evaluation.metrics_calculator import calculate_confusion_matrix_metrics
+    cm_analysis = calculate_confusion_matrix_metrics(y_test, model.predict(X_test))
+    print("\n--- Análisis avanzado de la matriz de confusión ---")
+    print("Matriz de confusión (conteo):\n", cm_analysis["confusion_matrix"])
+    print("Matriz de confusión (%):\n", cm_analysis["confusion_matrix_percent"])
+    print(f"Total muestras: {cm_analysis['total_samples']}")
+    print(f"Aciertos: {cm_analysis['correct_predictions']}")
+    print(f"Errores: {cm_analysis['incorrect_predictions']}")
+    print(f"Tasa de error: {cm_analysis['error_rate']:.2%}")
+
+    # Guardar el análisis avanzado de la matriz de confusión en un archivo
+    with open('results/confusion_matrix_analysis.txt', 'w') as f:
+        f.write('--- Análisis avanzado de la matriz de confusión ---\n')
+        f.write('Matriz de confusión (conteo):\n')
+        f.write(str(cm_analysis["confusion_matrix"]) + '\n')
+        f.write('Matriz de confusión (%):\n')
+        f.write(str(cm_analysis["confusion_matrix_percent"]) + '\n')
+        f.write(f'Total muestras: {cm_analysis["total_samples"]}\n')
+        f.write(f'Aciertos: {cm_analysis["correct_predictions"]}\n')
+        f.write(f'Errores: {cm_analysis["incorrect_predictions"]}\n')
+        f.write(f'Tasa de error: {cm_analysis["error_rate"]:.2%}\n')
+
+    # Visualizar y guardar la matriz de confusión en porcentaje
     cm = metrics['confusion_matrix']
-    # Crea una nueva figura de matplotlib con tamaño 6x5 pulgadas para la gráfica.
+    cm_percent = cm / cm.sum()  # Normaliza la matriz para mostrar porcentajes
     plt.figure(figsize=(6,5))
-    # Dibuja un mapa de calor (heatmap) de la matriz de confusión usando seaborn.
-    # - 'annot=True' muestra los valores en cada celda.
-    # - 'fmt="d"' muestra los valores como enteros.
-    # - 'cmap="Blues"' usa una paleta azul.
-    # - 'xticklabels' y 'yticklabels' ponen etiquetas descriptivas en los ejes.
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['No sobrevivió', 'Sobrevivió'], yticklabels=['No sobrevivió', 'Sobrevivió'])
-    # Añade la etiqueta 'Predicción' al eje X.
+    sns.heatmap(cm_percent, annot=True, fmt='.2f', cmap='Blues', xticklabels=['No sobrevivió', 'Sobrevivió'], yticklabels=['No sobrevivió', 'Sobrevivió'])
     plt.xlabel('Predicción')
-    # Añade la etiqueta 'Real' al eje Y.
     plt.ylabel('Real')
-    # Añade el título a la gráfica.
-    plt.title('Matriz de Confusión - Regresión Logística')
-    # Ajusta el diseño para evitar que los elementos se solapen.
+    plt.title('Matriz de Confusión (%) - Regresión Logística')
     plt.tight_layout()
-    # Asegura que la carpeta 'results' exista para guardar la imagen.
     os.makedirs('results', exist_ok=True)
-    # Guarda la gráfica como imagen PNG en la carpeta 'results'.
-    plt.savefig('results/confusion_matrix.png')
-    # Cierra la figura para liberar memoria.
+    plt.savefig('results/confusion_matrix_percent.png')
+    plt.close()
+
+    # Visualizar y guardar la matriz de confusión con conteos absolutos (número de intentos)
+    plt.figure(figsize=(6,5))
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['No sobrevivió', 'Sobrevivió'], yticklabels=['No sobrevivió', 'Sobrevivió'])
+    plt.xlabel('Predicción')
+    plt.ylabel('Real')
+    plt.title('Matriz de Confusión (Conteos) - Regresión Logística')
+    plt.tight_layout()
+    plt.savefig('results/confusion_matrix_counts.png')
     plt.close()
 
     # 9. Analizar la importancia de las variables
